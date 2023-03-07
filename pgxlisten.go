@@ -112,7 +112,7 @@ func (l *Listener) logError(ctx context.Context, err error) {
 // Handler is the interface by which notifications are handled.
 type Handler interface {
 	// HandleNotification is synchronously called by Listener to handle a notification. If processing the notification can
-	// take any significant amount of time this method should process it asyncronously (e.g. via goroutine with a
+	// take any significant amount of time this method should process it asynchronously (e.g. via goroutine with a
 	// different database connection). If an error is returned it will be logged with the Listener.LogError function.
 	HandleNotification(ctx context.Context, notification *pgconn.Notification, conn *pgx.Conn) error
 }
