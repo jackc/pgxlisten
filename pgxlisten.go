@@ -135,8 +135,8 @@ func (f HandlerFunc) HandleNotification(ctx context.Context, notification *pgcon
 // prepared for this situation when it is also a BacklogHandler.
 type BacklogHandler interface {
 	// HandleBacklog is synchronously called by Listener at the beginning of Listen at process any previously queued
-	// messages or jobs. If processing can take any significant amount of time this method should process it asyncronously
-	// (e.g. via goroutine with a different database connection). If an error is returned it will be logged with the
-	// Listener.LogError function.
+	// messages or jobs. If processing can take any significant amount of time this method should process it
+	// asynchronously (e.g. via goroutine with a different database connection). If an error is returned it will be logged
+	// with the Listener.LogError function.
 	HandleBacklog(ctx context.Context, channel string, conn *pgx.Conn) error
 }
