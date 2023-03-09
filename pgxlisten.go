@@ -14,7 +14,7 @@ import (
 // Listener connects to a PostgreSQL server, listens for notifications, and dispatches them to handlers based on
 // channel.
 type Listener struct {
-	// Connect establishes or gets otherwise gets a connection for the exclusive use of the Listener. Listener takes
+	// Connect establishes or otherwise gets a connection for the exclusive use of the Listener. Listener takes
 	// responsibility for closing any connection it receives. Connect is required.
 	Connect func(ctx context.Context) (*pgx.Conn, error)
 
