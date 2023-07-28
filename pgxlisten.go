@@ -56,10 +56,9 @@ func (l *Listener) Listen(ctx context.Context) error {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		default:
+		case <-time.After(time.Minute):
 			// If listenAndSendOneConn returned and ctx has not been cancelled that means there was a fatal database error.
 			// Wait a while to avoid busy-looping while the database is unreachable.
-			time.Sleep(time.Minute)
 		}
 	}
 }
