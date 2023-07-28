@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Start and set up PostgreSQL
+        run: |
+          sudo systemctl start postgresql.service
+          pg_isready
+          sudo -u postgres createuser -s runner
+          createdb runner
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3
+
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.19
+
+      # - name: Setup upterm session
+      #   uses: lhotari/action-upterm@v1
+      # with:
+      ## limits ssh access and adds the ssh public key for the user which triggered the workflow
+      # limit-access-to-actor: true
+
+      - name: Test
+        run: go test -race -v ./...
