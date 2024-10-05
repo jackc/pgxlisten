@@ -23,6 +23,10 @@ type Listener struct {
 	// attempted again later. LogError is optional.
 	LogError func(context.Context, error)
 
+	// ReconnectDelay configures the amount of time to wait before reconnecting in case the connection to the database
+	// is lost. If set to 0, the default of 1 minute is used. A negative value disables the timeout entirely.
+	ReconnectDelay time.Duration
+
 	handlers map[string]Handler
 }
 
@@ -47,16 +51,29 @@ func (l *Listener) Listen(ctx context.Context) error {
 		return errors.New("Listen: No handlers")
 	}
 
+	reconnectDelay := time.Minute
+	if l.ReconnectDelay != 0 {
+		reconnectDelay = l.ReconnectDelay
+	}
+
 	for {
 		err := l.listen(ctx)
 		if err != nil {
 			l.logError(ctx, err)
 		}
 
+		if reconnectDelay < 0 {
+			if err := ctx.Err(); err != nil {
+				return err
+			}
+
+			continue
+		}
+
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case <-time.After(time.Minute):
+		case <-time.After(reconnectDelay):
 			// If listenAndSendOneConn returned and ctx has not been cancelled that means there was a fatal database error.
 			// Wait a while to avoid busy-looping while the database is unreachable.
 		}
