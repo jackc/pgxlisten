@@ -114,7 +114,13 @@ func (h *msgHandler) HandleNotification(ctx context.Context, notification *pgcon
 
 func (h *msgHandler) HandleBacklog(ctx context.Context, channel string, conn *pgx.Conn) error {
 	var msg string
-	_, err := conn.QueryFunc(ctx, `select msg from pgxlisten_test`, nil, []any{&msg}, func(qfr pgx.QueryFuncRow) error {
+	rows, err := conn.Query(ctx, `SELECT msg FROM pgxlisten_test`)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	_, err = pgx.ForEachRow(rows, []any{&msg}, func() error {
 		h.ch <- msg
 		return nil
 	})
